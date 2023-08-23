@@ -27,8 +27,8 @@ public interface ItemMapper {
   public ItemImgDTO getImg(int itemId);                               // 이미지 보기
   public ItemImgDetailDTO getDetailImg(int itemId);                   // 상세 이미지 보기
   public int updateItem(ItemDTO itemDTO);                             // 상품 수정
-  public int editItemImg(ItemImgDTO itemImgDTO);                     // 이미지 수정
-  public int editItemImgDetail(ItemImgDetailDTO itemImgDetailDTO);   // 디테일 이미지  수정
+  public int editItemImg(ItemImgDTO itemImgDTO);                      // 이미지 수정
+  public int editItemImgDetail(ItemImgDetailDTO itemImgDetailDTO);    // 디테일 이미지 수정
   public int deleteItem(int itemId);                                  // 상품 삭제
   public List<CategoryDTO> getCateList();                             // 카테고리 목록 조회
   public int setCategory(String cateName);                            // 카테고리 등록

@@ -131,8 +131,6 @@
 	 WHERE CATE_CODE = #{cateCode}
 </delete>
 
-
-
 <!-- 아이템 등록 -->
 <insert id="insertItem" useGeneratedKeys="true" keyProperty="itemId" parameterType="ItemDTO">
   INSERT INTO ITEM(ITEM_NAME, PRICE, DESCRIPTION, CATE_CODE, STOCK)

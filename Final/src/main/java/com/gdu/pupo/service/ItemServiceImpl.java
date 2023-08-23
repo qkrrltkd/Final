@@ -2,12 +2,14 @@ package com.gdu.pupo.service;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +20,9 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gdu.pupo.domain.BuyDTO;
+import com.gdu.pupo.domain.BuyDetailDTO;
 import com.gdu.pupo.domain.CartDTO;
 import com.gdu.pupo.domain.CategoryDTO;
 import com.gdu.pupo.domain.ItemDTO;
@@ -40,6 +44,7 @@ public class ItemServiceImpl implements ItemService {
   private final MyFileUtil myFileUtil;
   private final PageUtil pageUtil;
   
+  // 상품 조회
   @Override
   public void getAllItems(HttpServletRequest request, Model model) {
     Optional<String> opt1 = Optional.ofNullable(request.getParameter("cateCode"));
@@ -78,11 +83,13 @@ public class ItemServiceImpl implements ItemService {
     model.addAttribute("itemImgList", itemImgList);
   }
   
+  // 카테고리 조회
   @Override
   public List<ItemDTO> getItemsByCategoryId(int categoryId) {
     return itemMapper.getItemsByCategoryId(categoryId);
   }
   
+  // 상품 등록
   @Transactional
   @Override
   public int insertItem(MultipartHttpServletRequest multipartRequest) {
@@ -177,6 +184,7 @@ public class ItemServiceImpl implements ItemService {
      
   }
   
+  // 상품 수정
   @Override
   public int itemUpdate(MultipartHttpServletRequest multipartRequest) {
     int itemId = Integer.parseInt(multipartRequest.getParameter("itemId"));
@@ -264,11 +272,13 @@ public class ItemServiceImpl implements ItemService {
     return updateResult;
   }
   
+  // 상품 삭제
   @Override
   public int itemDelete(int itemId) {
     return itemMapper.deleteItem(itemId);
   }
   
+  // 이미지
   @Override
   public ResponseEntity<byte[]> itemImgDisplay(int itemId) {
     ItemImgDTO itemImgDTO = itemMapper.getImg(itemId);
@@ -283,6 +293,7 @@ public class ItemServiceImpl implements ItemService {
     return image;
   }
   
+  // 상세 이미지 
   @Override
   public ResponseEntity<byte[]> itemImgDetailDisplay(int itemId) {
     ItemImgDetailDTO itemImgDetailDTO = itemMapper.getDetailImg(itemId);
@@ -296,57 +307,117 @@ public class ItemServiceImpl implements ItemService {
     return image;
   }
   
+  // 카테고리 조회
   @Override
   public List<CategoryDTO> getCateList() {
     return itemMapper.getCateList();
   }
   
+  // 카테고리 등록
   @Override
   public int setCategory(String cateName) {
     return itemMapper.setCategory(cateName);
   }
   
+  // 카테고리 이름 체크
   @Override
   public int checkCateName(String cateName) {
     return itemMapper.checkCateName(cateName);
   }
   
+  // 카테고리 삭제
   @Override
   public void deleteCate(String cateCode) {
     itemMapper.deleteCate(cateCode);
   }
   
+  // 장바구니 추가
   @Override
-  public void addCart(CartDTO cartDTO) {
-    itemMapper.addCart(cartDTO);
+  public void addCart(HttpServletRequest request) {
+      HttpSession session = request.getSession();
+      String id = (String) session.getAttribute("loginId");
+      CartDTO cartDTO = new CartDTO();
+      cartDTO.setId(id);
+      cartDTO.setItemId(Integer.parseInt(request.getParameter("itemId")));
+      cartDTO.setQuantity(Integer.parseInt(request.getParameter("quantity")));
+      itemMapper.addCart(cartDTO);
   }
   
+  // 장바구니 조회
   @Override
-  public List<CartDTO> getCartList(String id) {
-    return itemMapper.getCartList(id);
+  public String cartList(HttpServletRequest request, Model model) {
+      HttpSession session = request.getSession();
+      String id = (String) session.getAttribute("loginId");
+      List<CartDTO> cartList = itemMapper.getCartList(id);
+      model.addAttribute("cartList", cartList);
+
+      int total = 0;
+      for (CartDTO cart : cartList) {
+          total += cart.getTotalPrice();
+      }
+      model.addAttribute("total", total);
+      return "item/cartList";
   }
   
+  // 장바구니 수정
   @Override
-  public void updateCart(CartDTO cartDTO) {
+  public String cartUpdate(CartDTO cartDTO) {
     itemMapper.updateCart(cartDTO);
+    return "redirect:/item/cartList.html";
   }
   
+  // 장바구니 삭제
   @Override
-  public void deleteCart(String cartId) {
-    itemMapper.deleteCart(cartId);
+  public String deleteCart(String cartId) {
+      itemMapper.deleteCart(cartId);
+      return "redirect:/item/cartList.html";
   }
   
+  // 장바구니 선택 삭제
   @Override
-  public void deleteCarts(CartDTO cartDTO) {
-    itemMapper.deleteCarts(cartDTO);
+  public String deleteCarts(List<String> cartIds) {
+      if (cartIds == null || cartIds.isEmpty()) {
+          return "redirect:/item/cartList.html";
+      }
+
+      CartDTO cartDTO = new CartDTO();
+      cartDTO.setCartIdList(cartIds);
+
+      itemMapper.deleteCarts(cartDTO);
+
+      return "redirect:/item/cartList.html";
   }
   
+  // 상품 구매
   @Override
-  public void itemBuy(BuyDTO buyDTO) {
-    itemMapper.itemBuy(buyDTO);
-    itemMapper.itemBuyDetail(buyDTO);
+  public String itemBuys(HashMap<String, Object> map, HttpServletRequest request) {
+      String buyId = getBuyId();
+
+      HttpSession session = request.getSession();
+      String id = (String) session.getAttribute("loginId");
+
+      int buyPrice = Integer.parseInt(map.get("final_price").toString());
+
+      BuyDTO buyDTO = new BuyDTO();
+      buyDTO.setBuyId(buyId);
+      buyDTO.setId(id);
+      buyDTO.setBuyPrice(buyPrice);
+
+      ObjectMapper mapper = new ObjectMapper();
+      BuyDetailDTO[] buyDetailArr = mapper.convertValue(map.get("detail_info_arr"), BuyDetailDTO[].class);
+      List<BuyDetailDTO> buyDetailList = Arrays.asList(buyDetailArr);
+
+      for (BuyDetailDTO e : buyDetailList) {
+          e.setBuyId(buyId);
+      }
+      buyDTO.setItemBuyDetailList(buyDetailList);
+
+      itemMapper.itemBuy(buyDTO);
+
+      return "item/itemBuys.html";
   }
   
+  //구매 아이디 조회
   @Override
   public String getBuyId() {
     return itemMapper.getBuyId();

@@ -1,5 +1,6 @@
 package com.gdu.pupo.service;
 
+import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -8,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import com.gdu.pupo.domain.BuyDTO;
 import com.gdu.pupo.domain.CartDTO;
 import com.gdu.pupo.domain.CategoryDTO;
 import com.gdu.pupo.domain.ItemDTO;
@@ -28,11 +28,11 @@ public interface ItemService {
     public int checkCateName(String cateName);                                // 카테고리 중복 체크
     public void deleteCate(String cateCode);                                  // 카테고리 삭제
     // public List<ItemDTO> selectItem();                                     // 아이템 조회
-    public void addCart(CartDTO cartDTO);                                     // 장바구니 등록
-    public List<CartDTO> getCartList(String id);                              // 장바구니 조회
-    public void updateCart(CartDTO cartDTO);                                  // 장바구니 수량 수정
-    public void deleteCart(String cartId);                                    // 장바구니 삭제
-    public void deleteCarts(CartDTO cartDTO);                                 // 장바구니 선택 삭제
-    public void itemBuy(BuyDTO buyDTO);                                       // 장바구니 선택 구매
+    public void addCart(HttpServletRequest request);                                    // 장바구니 등록
+    public String cartList(HttpServletRequest request, Model model);                              // 장바구니 조회
+    public String cartUpdate(CartDTO cartDTO);                                  // 장바구니 수량 수정
+    public String deleteCart(String cartId);                                    // 장바구니 삭제
+    public String deleteCarts(List<String> cartIds);                                 // 장바구니 선택 삭제
+    public String itemBuys(HashMap<String, Object> map, HttpServletRequest request);                                       // 장바구니 선택 구매
     public String getBuyId();                                                 // 구매자 아이디 반환
 }

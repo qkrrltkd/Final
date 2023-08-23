@@ -1,11 +1,9 @@
 package com.gdu.pupo.controller;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -19,9 +17,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gdu.pupo.domain.BuyDTO;
-import com.gdu.pupo.domain.BuyDetailDTO;
 import com.gdu.pupo.domain.CartDTO;
 import com.gdu.pupo.service.ItemService;
 
@@ -96,88 +91,37 @@ public class ItemController {
     @ResponseBody
     @PostMapping("/addCart.do")
     public void addCart(HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        String id = (String) session.getAttribute("loginId");
-        CartDTO cartDTO = new CartDTO();
-        cartDTO.setId(id);
-        cartDTO.setItemId(Integer.parseInt(request.getParameter("itemId")));
-        cartDTO.setQuantity(Integer.parseInt(request.getParameter("quantity")));
-        itemService.addCart(cartDTO);
+        itemService.addCart(request);
     }
 
     // 장바구니 이동
     @GetMapping("/cartList.html")
     public String cartList(HttpServletRequest request, Model model) {
-        HttpSession session = request.getSession();
-        String id = (String) session.getAttribute("loginId");
-        List<CartDTO> cartList = itemService.getCartList(id);
-        model.addAttribute("cartList", cartList);
-
-        int total = 0;
-        for (CartDTO cart : cartList) {
-            total += cart.getTotalPrice();
-        }
-        model.addAttribute("total", total);
-        return "item/cartList";
+        return itemService.cartList(request, model);
     }
 
     // 장바구니 수량 수정
     @PostMapping("/updateQuantity")
     public String cartUpdate(CartDTO cartDTO) {
-        itemService.updateCart(cartDTO);
-        return "redirect:/item/cartList.html";
+        return itemService.cartUpdate(cartDTO);
     }
 
     // 장바구니 삭제
     @PostMapping("/deleteCart")
     public String deleteCart(@RequestParam("cartId") String cartId) {
-        itemService.deleteCart(cartId);
-        return "redirect:/item/cartList.html";
+        return itemService.deleteCart(cartId);
     }
 
     // 장바구니 선택삭제
     @PostMapping("/deleteCarts")
     public String deleteCarts(@RequestBody List<String> cartIds) {
-        if (cartIds == null || cartIds.isEmpty()) {
-            return "redirect:/item/cartList.html";
-        }
-
-        CartDTO cartDTO = new CartDTO();
-        cartDTO.setCartIdList(cartIds);
-
-        itemService.deleteCarts(cartDTO);
-
-        return "redirect:/item/cartList.html";
+        return itemService.deleteCarts(cartIds);
     }
 
     // 장바구니 선택구매
     @PostMapping("/itemBuys")
     public String itemBuys(@RequestBody HashMap<String, Object> map, HttpServletRequest request) {
-        System.out.println(map);
-        String buyId = itemService.getBuyId();
-
-        HttpSession session = request.getSession();
-        String id = (String) session.getAttribute("loginId");
-
-        int buyPrice = Integer.parseInt(map.get("final_price").toString());
-
-        BuyDTO buyDTO = new BuyDTO(); // Create a new BuyDTO object
-        buyDTO.setBuyId(buyId);
-        buyDTO.setId(id);
-        buyDTO.setBuyPrice(buyPrice);
-
-        ObjectMapper mapper = new ObjectMapper();
-        BuyDetailDTO[] buyDetailArr = mapper.convertValue(map.get("detail_info_arr"), BuyDetailDTO[].class);
-        List<BuyDetailDTO> buyDetailList = Arrays.asList(buyDetailArr);
-
-        for (BuyDetailDTO e : buyDetailList) {
-            e.setBuyId(buyId);
-        }
-        buyDTO.setItemBuyDetailList(buyDetailList);
-
-        itemService.itemBuy(buyDTO);
-
-        return "item/itemBuys.html"; 
+        return itemService.itemBuys(map, request);
     }
 
     // 상품 리스트 페이지
