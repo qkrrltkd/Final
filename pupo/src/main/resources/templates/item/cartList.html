@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<!--/* /layout/header.html의 headFrag조각으로 head 태그를 바꾼다. */-->
+<head th:replace="~{/layout/header::headFrag('fullPowerSalad')}"></head>
+
+<!--/* /layout/header.html의 gnbFrag조각으로 div 태그를 바꾼다. */-->
+<div th:replace="~{/layout/header::gnbFrag}"></div>
+
+<body>
+<!-- top -->
+ <div th:fragment="topFrag" class="top">
+  <div id="app">
+    <div class="main-wrapper main-wrapper-1">
+      <div class="navbar-bg"></div>
+      <nav class="navbar navbar-expand-lg main-navbar">
+          <ul class="navbar-nav mr-3">
+            <li><a href="#" data-toggle="sidebar" class="nav-link nav-link-lg"><i class="fas fa-bars"></i></a></li>
+          </ul>
+      </nav>
+     </div>
+      
+  <!-- Main Content -->
+  <div class="mainContent">
+        <div class="title">
+            <h3>장바구니</h3>
+        </div>
+        <div class="regi_table">
+            <table tit aria-setsize="500px">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="chkAll"></th>
+                        <th>상품명</th>
+                        <th>가격</th>
+                        <th>수량</th>
+                        <th>총 가격</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <th:block th:if="${#lists.size(cartList) == 0}">
+                        <tr>
+                            <td colspan="7">장바구니에 담긴 상품이 없습니다.</td>
+                        </tr>
+                    </th:block>
+                    <th:block th:if="${#lists.size(cartList) != 0}">
+                        <tr th:each="cart : ${cartList}">
+                            <td><input type="checkbox" class="chk_all" name="chk-${cart.cartId}" id="chk-${cart.cartId}" th:value="${cart.cartId}" checked th:data-item-id="${cart.itemDTO.itemId}" th:data-quantity="${cart.quantity}" th:data-total-price="${cart.totalPrice}"></td>
+                            <td><a th:href="@{'/item/itemDetail?itemId=' + ${cart.itemDTO.itemId}}" th:text="${cart.itemDTO.itemName}"></a></td>
+                            <td th:text="${#numbers.formatCurrency(cart.itemDTO.price)}"></td>
+                            <td style="width: 25%;">
+                                <form th:action="@{/item/updateQuantity}" method="post">
+                                    <input type="hidden" name="cartId" th:value="${cart.cartId}">
+                                    <div class="row">
+                                        <div class="col-7">
+                                            <input type="number" class="form-control" min="1" name="quantity" th:value="${cart.quantity}">
+                                        </div>
+                                        <div class="d-grid">
+                                            <input type="submit" class="btn btn-primary" th:value="수정">
+                                        </div>
+                                    </div>
+                                </form>
+                            </td>
+                            <td id="totalPriceChk" data-name="java" th:attr="data-total-price=${cart.totalPrice}" th:text="${#numbers.formatCurrency(cart.totalPrice)} + '원'"></td>
+                            <td>
+                                <div class="d-grid">
+                                    <div class="d-grid">
+                                        <form th:action="@{/item/deleteCart}" method="post">
+                                            <input type="hidden" name="cartId" th:value="${cart.cartId}" />
+                                            <button type="submit" class="btn btn-danger">삭제</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </th:block>
+                </tbody>
+            </table>
+
+            <div class="row mb-3">
+                <div class="offset-10 col-1 d-grid">구매금액</div>
+                <div class="col-1" id="finalPrice">[[${#numbers.formatCurrency(total)}]]</div>
+                <input type="hidden" id="total" name="total" th:value="${total}">
+            </div>
+
+            <div class="row mb-3">
+                <div class="offset-5 col-1 d-grid">
+                    <input type="button" class="btn btn-primary" value="선택구매" onclick="itemBuys();">
+                </div>
+                <div class="col-1 d-grid">
+                    <input type="button" class="btn btn-danger" value="선택삭제" onclick="deleteCarts();" />
+                </div>
+            </div>
+        </div>
+    </div>
+ <div th:replace="~{/layout/footer::gnbFooter}"></div>
+</body>
+<script th:inline="javascript">
+
+// 전체선택
+function fnChkAll() {
+  $('#chk_all').on('click', function() {
+    $(':checkbox[name="cartItemId"]').prop('checked', $(this).prop('checked'));
+    calculateTotalPrice();
+  });
+}
+
+document.querySelector('#chkAll').addEventListener('click', function() {
+    const allChks = document.querySelectorAll('[name^="chk-"]');
+    const isChecked = this.checked;
+    
+    for (const chk of allChks) {
+        chk.checked = isChecked;
+    }
+    
+    calculateTotalPrice();
+});
+
+// 금액
+function calculateTotalPrice() {
+    const checkedChks = document.querySelectorAll('[name^="chk-"]:checked');
+    let totalPrice = 0;
+    
+    for (const chk of checkedChks) {
+        const spanTag = chk.closest('tr').querySelector('#totalPriceChk');
+        const price = parseInt(spanTag.getAttribute('data-total-price').replace(/,/g, ''));
+        totalPrice += price;
+    }
+
+    document.querySelector('#finalPrice').textContent = totalPrice.toLocaleString();
+    document.querySelector('#total').value = totalPrice;
+};
+
+// 선택 삭제 기능
+function deleteCarts() {
+    const chks = document.querySelectorAll('[name^="chk-"]:checked');
+    if (chks.length === 0) {
+        alert('선택한 상품이 없습니다.');
+        return;
+    }
+
+    const cartIds = Array.from(chks).map(chk => chk.value);
+
+    $.ajax({
+        type: 'POST', // POST 요청으로 수정
+        url: 'deleteCarts',
+        data: JSON.stringify(cartIds),
+        contentType: 'application/json; charset=UTF-8', // 컨텐트 타입 설정
+        success: function(result) {
+                location.href = 'cartList.html'; // 선택삭제 후 장바구니 페이지로 이동
+        },
+        error: function(xhr, status, error) {
+            console.error(xhr.responseText);
+            alert('선택삭제 도중 오류가 발생했습니다.');
+        }
+    });
+}
+
+// 선택 구매
+function itemBuys () {
+    const checked_checkboxes = document.querySelectorAll('.chk_all:checked');
+    if (checked_checkboxes.length == 0) {
+        alert('구매할 상품을 선택하세요.');
+        return;
+    }
+    
+    //체크된 체크박스의 dataset 확인
+    for(const e of checked_checkboxes ){
+        console.log(e.dataset);
+    }
+    
+    // 넘길 데이터
+    const detail_info_arr = []
+    let final_price = 0; // 선택한 상품의 총 합계 금액
+    for(let i=0; i<checked_checkboxes.length; i++){
+        const checkbox = checked_checkboxes[i];
+        final_price += parseInt(checkbox.dataset.totalPrice); // 선택한 상품의 합계 금액을 누적으로 더함
+        
+        const buy_detail_info = {
+            'itemId': checkbox.dataset.itemId,
+            'buyQuantity': checkbox.dataset.quantity,
+            'detailBuyPrice': checkbox.dataset.totalPrice
+        };
+        detail_info_arr.push(buy_detail_info);
+    }
+    
+    const data = {
+            'final_price': final_price,
+            'detail_info_arr': detail_info_arr
+    };
+    
+    $.ajax({
+        type: 'POST',
+        url: '/item/itemBuys',
+        data: JSON.stringify(data),
+        contentType: 'application/json; charset=UTF-8',
+        success: function(result){
+            alert('선택한 상품을 구매합니다.');
+            deleteCarts();
+            /* const quantity = document.querySelector('#quanitty');
+            quantity.replaceChildren(); */
+        },
+        error: function(){
+            alert('실패');
+        }
+    })
+}
+
+</script>
+<style>
+.mainContent{
+  margin-top:50px;
+}
+li{
+  list-style: none;
+}
+body{
+  color: #303030;
+}
+a{
+  text-decoration: none;
+  color: #303030;
+  font-size: 17px;
+}
+#excelDown{
+  float:right;
+  margin-right: 30px;
+}
+#pro_regiBtn{
+  float:right;
+  margin-right: 30px;
+}
+.rbtn #excelDown , #pro_regiBtn, #regBtn{
+  background-color: #8FA691; 
+  border: none;
+  color: white;
+  padding: 8px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 15px;
+  margin: px 2px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+  font-weight: 900;
+}
+.rbtn #excelDown:hover, #pro_regiBtn:hover, #regBtn:hover{
+  background-color: white; 
+  color: #8FA691; 
+  border: 2px solid #8FA691;
+}
+.rbtn #excelDown, #pro_regiBtn, #regBtn{
+  background-color: #8FA691;
+  color: white;
+}
+.rbtn #excelDown:focus, #pro_regiBtn:focus, #regBtn:focus { 
+  outline: none; 
+}
+.regi_la{
+  font-size: 17px;                      
+}
+table {
+  border-collapse: collapse;
+  width: 90%;
+  margin-left: 100px;
+}
+.regi_list-btn{
+  margin-bottom: 80px;
+}
+
+/*배치*/
+th, td {
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #8FA691;
+  color: white;            
+  height: 40px;
+  text-align:center;
+}
+
+tr:hover {
+  background-color: #f5f5f5;
+}
+
+.check {
+  height: 30px;
+  left: 30%;
+}
+
+.text {
+  width: 50%;
+  height: 25px;
+}
+
+.serch {
+  margin-left: 100px;
+  margin-bottom: 10px;
+}
+
+.sb {
+  height: 35px;
+}
+
+.select_state{
+  margin-left:130px;
+  margin-bottom:30px;
+
+}
+
+.page_num1 {
+  display: inline-block;
+  padding-left:70%;
+}
+
+.page_num1 a{
+ color: black;
+ float: left;
+ padding: 8px 16px;
+ text-decoration: none;
+}
+
+.pagination1 a:hover:not(.active) {
+  background-color: #8FA691;
+  border-radius: 50%;
+}
+
+.regi_table{
+  margin-bottom: 20px;
+}
+
+.default_btn{
+  background-color: #8FA691;
+  border: solid #8FA691;
+  border-radius:10px;
+  color:white;
+  margin-left: 10px;
+}
+
+.mainContent .title {
+  margin-left: 100px;
+}
+
+.mainContent h3{
+  font-weight:500;
+  font-size:24px;
+  margin-bottom:10px;
+}
+
+.mainContent p{
+    color: #b9b9b9;
+    margin-top:0;
+}
+
+/* 모달디자인 시작  */
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.modal-header {
+  padding: 2px 16px;
+  background-color: white;
+  color: white;
+}
+
+.modal-body {padding: 2px 16px;}
+
+.modal-footer {
+  padding: 2px 16px;
+  background-color: white;
+  color: white;
+}
+
+
+#closeBtn {
+  background-color: #8FA691; 
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+}
+
+#closeBtn:hover {
+  background-color: white; 
+  color: #8FA691; 
+  border: 2px solid #8FA691;
+
+}
+
+#closeBtn:focus {
+  outline: none; 
+
+}
+/* 모달 디자인 끝 */
+</style>
+</html>

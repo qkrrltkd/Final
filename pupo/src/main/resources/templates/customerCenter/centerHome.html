@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<style>
+.fnRowButton {
+cursor: pointer;
+}
+</style>
+<!--/* /layout/header.html의 headFrag조각으로 head 태그를 바꾼다. */-->
+<head th:replace="~{/layout/header::headFrag('고객센터')}"></head>
+<div th:replace="~{/layout/header::gnbFrag}"></div>
+  
+<body class="goto-here">
+  <div class="ftco-section">
+    <div class="container">
+      <header> 
+        <div class="nav navbar ftco-animate">
+          <div class="row section-header-breadcrumb">
+            <div class="breadcrumb-item"><a th:href="@{/}">HOME</a></div>
+            <div class="breadcrumb-item">고객센터</div>
+          </div>
+        </div>
+        <div class="row justify-content-center mb-2 pb-3">
+        <div class="col-md-7 heading-section text-center">
+            <span class="subheading ftco-animate ">FullPowerSalad</span>
+            <h2 class="mb-4 ftco-animate">무엇을 도와 드릴까요?</h2>
+            <p class="ftco-animate">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in</p>
+          </div>
+          </div>
+      </header>
+      <section>
+      <div class="row mt-1">
+              <div class="card-body" style="width: 100%">
+        <div class="row ftco-animate">
+          <div class="col-md-12">
+            <div class="carousel-testimony owl-carousel">
+              <div class="item">
+                <div class="testimony-wrap p-4 pb-5">
+                  <div class=" mb-5" >
+                    <span class="quote d-flex align-items-center justify-content-center">
+                     <i class="fa-solid fa-question fa-2xl"></i>
+                    </span>
+                  </div>
+                  <div class="text text-center">
+                    <p class="mb-5 pl-4 line">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
+                    <p class="name">Garreth Smith</p>
+                    <span class="position">Marketing Manager</span>
+                  </div>
+                </div>
+              </div>
+              <div class="item">
+                <div class="testimony-wrap p-4 pb-5">
+                  <div class=" mb-5" >
+                    <span class="quote d-flex align-items-center justify-content-center">
+                     <i class="fa-solid fa-question fa-2xl"></i>
+                    </span>
+                  </div>
+                  <div class="text text-center">
+                    <p class="mb-5 pl-4 line">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
+                    <p class="name">Garreth Smith</p>
+                    <span class="position">Interface Designer</span>
+                  </div>
+                </div>
+              </div>
+              <div class="item">
+                <div class="testimony-wrap p-4 pb-5">
+                  <div class=" mb-5" >
+                    <span class="quote d-flex align-items-center justify-content-center">
+                     <i class="fa-solid fa-question fa-2xl"></i>
+                    </span>
+                  </div>
+                  <div class="text text-center">
+                    <p class="mb-5 pl-4 line">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
+                    <p class="name">Garreth Smith</p>
+                    <span class="position">UI Designer</span>
+                  </div>
+                </div>
+              </div>
+              <div class="item">
+                <div class="testimony-wrap p-4 pb-5">
+                  <div class="mb-5" >
+                    <span class="quote d-flex align-items-center justify-content-center">
+                     <i class="fa-solid fa-question fa-2xl"></i>
+                    </span>
+                  </div>
+                  <div class="text text-center">
+                    <p class="name">식단 관리는 무엇인가요?</p>
+                    <p class="mb-5 pl-4 line">식단관리는 그리팅의 원칙에 따라 철저한 영양 설계로 만들어지는 식사입니다.
+                      최대 2주 간, 주 3회까지 배송이 가능하며 신선한 식사를 위해 모든 식단은 주문 후 생산을 원칙으로 합니다.
+                      식단관리 프로그램은 원하는 일정대로 설계 할 수도 있고, 빠른 주문을 위해서는 추천 기능을 사용 할 수 있습니다.</p>
+                    <span class="position">Web Developer</span>
+                  </div>
+                </div>
+              </div>
+              <div class="item">
+                <div class="testimony-wrap p-4 pb-5">
+                  <div class="mb-5" >
+                    <span class="quote d-flex align-items-center justify-content-center">
+                     <i class="fa-solid fa-question fa-2xl"></i>
+                    </span>
+                  </div>
+                  <div class="text text-center">
+                    <p class="mb-5 pl-4 line">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
+                    <p class="name">Garreth Smith</p>
+                    <span class="position">System Analyst</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+   
+   
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              </div>
+            </div>
+    
+          <div class="row aline-items-center">
+        </div>
+      </section>
+    </div>
+  </div>
+  <div th:replace="~{/layout/footer::gnbFooter}"></div> 
+</body>
+<script th:inline="javascript">
+
+</script>
+<script src="https://kit.fontawesome.com/bfad29b6fa.js" crossorigin="anonymous"></script>
+</html>

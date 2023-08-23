@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace는 @Mapper를 지정한다. -->
+<mapper namespace="com.gdu.pupo.mapper.ItemMapper">
+
+<resultMap type="ItemDTO" id="ItemMap">
+	<id column="ITEM_ID" property="itemId" />
+	<result column="ITEM_NAME" property="itemName" />
+	<result column="PRICE" property="price" />
+	<result column="DESCRIPTION" property="description" />
+	<result column="STOCK" property="stock" />
+	<!-- <association resultMap="CategoryDTO" property="CategoryMap"></association> -->
+</resultMap>
+
+ 
+<resultMap type="CategoryDTO" id="CategoryMap">
+	<id column="CATE_CODE" property="cateCode"/>
+	<result column="CATE_NAME" property="cateName" />
+	<result column="ORDER_NUM" property="orderNum" />
+	<result column="IS_USE" property="isUse" />
+</resultMap>
+
+<resultMap type="CartDTO" id="CartMap">
+	<id column="CART_ID" property="cartId"></id>
+	<result column="ITEM_ID" property="itemId"></result>
+	<result column="ID" property="id"></result>
+	<result column="QUANTITY" property="quantity"></result>
+	<result column="CREATED_AT" property="createdAt"></result>
+	<result column="UPDATED_AT" property="updatedAt"></result>
+	<result column="TOTAL_PRICE" property="totalPrice"></result>
+	<association property="itemDTO" resultMap="ItemMap"></association>
+</resultMap>
+
+<!-- 장바구니 담기 -->
+<insert id="addCart" parameterType="map">
+	 INSERT INTO CART( CART_ID, ITEM_ID, ID, QUANTITY )
+    VALUES (
+        (SELECT CONCAT('CART_', LPAD(IFNULL(MAX(SUBSTR(CART_ID, 6)), 0) + 1, 3, '0')) FROM (SELECT CART_ID FROM CART) AS TEMP),
+        #{itemId}, #{id}, #{quantity}
+    )
+    ON DUPLICATE KEY UPDATE QUANTITY = QUANTITY + #{quantity};
+</insert>
+
+<!-- 장바구니 목록 조회 -->
+<select id="getCartList" resultMap="CartMap">
+	SELECT CART_ID, ITEM.ITEM_ID, ITEM_NAME, PRICE, QUANTITY, PRICE * QUANTITY AS TOTAL_PRICE
+	  FROM CART, ITEM
+	 WHERE CART.ITEM_ID = ITEM.ITEM_ID
+	   AND ID = #{id}
+</select>
+
+<!-- 장바구니 수정 -->
+<update id="updateCart" parameterType="CartDTO">
+	UPDATE CART
+	   SET QUANTITY = #{quantity}
+	 WHERE CART_ID = #{cartId}
+</update>
+
+<!-- 장바구니 삭제 -->
+<delete id="deleteCart" parameterType="String">
+	DELETE FROM CART
+	 WHERE CART_ID = #{cartId}
+</delete>
+
+<!-- 장바구니 선택 삭제 -->
+<delete id="deleteCarts">
+	DELETE FROM CART
+	 WHERE CART_ID IN
+	 <foreach collection="cartIdList" item="cartId" open="(" close=")" separator=",">
+	 	#{cartId}
+	 </foreach>
+</delete>
+ 
+<!-- 장바구니 선택 구매 -->
+<insert id="itemBuy">
+	INSERT INTO ITEM_BUY (BUY_ID, ID, BUY_PRICE)
+	VALUES (#{buyId}, #{id}, #{buyPrice})
+</insert> 
+
+<insert id="itemBuyDetail">
+	INSERT INTO ITEM_BUY_DETAIL (
+		BUY_DETAIL_ID
+	  , ITEM_ID
+	  , BUY_QUANTITY
+	  , DETAIL_BUY_PRICE
+	  , BUY_ID
+	  )
+	<foreach collection="itemBuyDetailList" item="itemBuyDetail" separator="UNION ALL" index="i">
+		SELECT CONCAT('ITEM_BUY_DETAIL_', LPAD(COALESCE(SUBSTRING_INDEX(MAX(BUY_DETAIL_ID), '_', -1), 0) + 1 + #{i}, 3, '0'))
+		, #{itemBuyDetail.itemId}
+		, #{itemBuyDetail.buyQuantity}
+		, #{itemBuyDetail.detailBuyPrice}
+		, #{itemBuyDetail.buyId}
+		FROM ITEM_BUY_DETAIL
+	</foreach>
+</insert>
+
+<select id="getBuyId" resultType="String">
+    SELECT CONCAT('BUY_', LPAD(IFNULL(MAX(CAST(SUBSTR(BUY_ID, 5) AS UNSIGNED)), 0) + 1, 3, '0'))
+    FROM ITEM_BUY;
+</select>
+
+
+ 
+<!-- 카테고리 리스트  -->
+<select id="getCateList" resultMap="CategoryMap">
+	SELECT CATE_CODE, CATE_NAME, ORDER_NUM, IS_USE
+	  FROM CATEGORY
+</select>
+
+<!-- 카테고리 등록 -->
+<insert id="setCategory">
+  INSERT INTO CATEGORY (CATE_CODE, CATE_NAME, ORDER_NUM)
+  SELECT CONCAT('CATE_', LPAD(IFNULL(MAX(CAST(SUBSTRING(CATE_CODE, 6) AS UNSIGNED)), 0) + 1, 3, '0')), #{cateName}, IFNULL(MAX(ORDER_NUM), 0) + 1
+  FROM CATEGORY
+  </insert>
+
+<!-- 카테고리 중복체크 -->
+<select id="checkCateName" resultType="int">
+	SELECT COUNT(CATE_CODE)
+	  FROM CATEGORY
+	 WHERE CATE_NAME = #{cateName}
+</select>
+
+<!-- 카테고리 삭제 -->
+<delete id="deleteCate">
+	DELETE FROM CATEGORY
+	 WHERE CATE_CODE = #{cateCode}
+</delete>
+
+
+
+<!-- 아이템 등록 -->
+<insert id="insertItem" useGeneratedKeys="true" keyProperty="itemId" parameterType="ItemDTO">
+  INSERT INTO ITEM(ITEM_NAME, PRICE, DESCRIPTION, CATE_CODE, STOCK)
+  VALUES (#{itemName}, #{price}, #{description}, #{cateCode}, #{stock})
+</insert>
+
+<!-- 전체 아이템 조회 -->
+<select id="getAllItems" parameterType="Map" resultType="ItemDTO">
+  SELECT ITEM_ID, ITEM_NAME, PRICE, DESCRIPTION, STOCK
+    FROM ITEM
+    <where>
+      <if test="query != null and query != ''">
+       ITEM_NAME LIKE CONCAT('%', #{query}, '%') OR DESCRIPTION LIKE CONCAT('%', #{query}, '%')
+      </if>
+    </where>
+   ORDER BY ITEM_ID DESC
+   LIMIT #{begin}, #{recordPerPage}
+</select>
+
+<!-- 총 상품 갯수 -->
+<select id="getItemCount" resultType="int">
+	SELECT COUNT(*)
+	  FROM ITEM
+</select>
+
+<!-- 카테고리 별 아이템 조회 -->
+<select id="getItemsByCategoryId" parameterType="int" resultType="ItemDTO">
+  SELECT I.ITEM_ID, I.ITEM_NAME, I.PRICE, I.DESCRIPTION, I.STOCK, C.CATEGORY_NAME
+    FROM ITEM I INNER JOIN CATEGORY C 
+      ON I.CATEGORY_ID = C.CATEGORY_ID
+   WHERE I.CATEGORY_ID = #{categoryId}
+</select>
+
+
+<!-- 아이템 상세 조회 -->
+<select id="getItem" parameterType="int" resultType="ItemDTO">
+  SELECT ITEM_ID, ITEM_NAME, PRICE, DESCRIPTION, CATE_CODE, STOCK
+    FROM ITEM
+   WHERE ITEM_ID = #{itemId}
+</select>
+
+<!-- 상세 이미지 리스트 -->
+<select id="itemImgDetailList" resultType="ItemImgDetailDTO">
+  SELECT ITEM_ID, ORIGIN_DETAIL_NAME
+   FROM ITEM_IMG_DETAIL
+</select>
+
+<!-- 메인 이미지 리스트 -->
+<select id="itemImgList" resultType="ItemImgDTO">
+  SELECT ITEM_ID, ORIGIN_NAME
+   FROM ITEM_IMG
+</select>
+  
+
+<!-- 아이템 수정 -->
+<update id="updateItem" parameterType="ItemDTO">
+  UPDATE ITEM
+     SET ITEM_NAME = #{itemName}
+       , PRICE = #{price}
+       , DESCRIPTION = #{description}
+       , CATE_CODE = #{cateCode}
+       , STOCK = #{stock}
+   WHERE ITEM_ID = #{itemId}
+</update>
+
+<!-- 아이템 삭제 -->
+<delete id="deleteItem" parameterType="int">
+  DELETE FROM ITEM
+   WHERE ITEM_ID = #{itemId}
+</delete>
+
+<!-- 이미지 등록 -->
+<insert id="insertImg" useGeneratedKeys="true" keyProperty="imgId" parameterType="ItemImgDTO">
+    INSERT INTO ITEM_IMG(PATH, ORIGIN_NAME, FILESYSTEM_NAME, HAS_THUMBNAIL, ITEM_ID)
+      VALUES(#{path}, #{originName}, #{filesystemName}, #{hasThumbnail}, #{itemId})
+  </insert> 
+  
+<!-- 디테일 이미지 등록 -->
+<insert id="insertDetailImg" useGeneratedKeys="true" keyProperty="imgDetailId" parameterType="ItemImgDetailDTO">
+  INSERT INTO ITEM_IMG_DETAIL(PATH_DETAIL, ORIGIN_DETAIL_NAME, FILESYSTEM_DETAIL_NAME, HAS_DETAIL_THUMBNAIL, ITEM_ID)
+    VALUES(#{pathDetail}, #{originDetailName}, #{filesystemDetailName}, #{hasDetailThumbnail}, #{itemId})
+</insert>
+
+<!-- 이미지 조회 -->
+<select id="getImg" parameterType="int" resultType="ItemImgDTO">
+  SELECT IMG_ID, PATH, ORIGIN_NAME, FILESYSTEM_NAME, HAS_THUMBNAIL, ITEM_ID
+    FROM ITEM_IMG
+   WHERE ITEM_ID = #{itemId}
+</select>
+
+<!-- 상세 이미지 조회 -->
+<select id="getDetailImg" parameterType="int" resultType="ItemImgDetailDTO">
+  SELECT IMG_DETAIL_ID, PATH_DETAIL, ORIGIN_DETAIL_NAME, FILESYSTEM_DETAIL_NAME, HAS_DETAIL_THUMBNAIL, ITEM_ID
+    FROM ITEM_IMG_DETAIL
+   WHERE ITEM_ID = #{itemId}
+</select>
+
+<!-- 이미지 수정 -->
+<update id="editItemImg" parameterType="ItemImgDTO">
+UPDATE ITEM_IMG
+SET PATH = #{path}
+  , ORIGIN_NAME  = #{originName}
+  , FILESYSTEM_NAME  = #{filesystemName}
+  , HAS_THUMBNAIL  = #{hasThumbnail}
+  WHERE ITEM_ID = #{itemId}
+</update>
+
+
+<!-- 디테일 이미지 수정 -->
+<update id="editItemImgDetail" parameterType="ItemImgDetailDTO">
+UPDATE ITEM_IMG_DETAIL
+SET PATH_DETAIL  = #{pathDetail}
+  , ORIGIN_DETAIL_NAME  = #{originDetailName}
+  , FILESYSTEM_DETAIL_NAME  = #{filesystemDetailName}
+  , HAS_DETAIL_THUMBNAIL  = #{hasDetailThumbnail}
+  WHERE ITEM_ID = #{itemId}
+</update>
+
+</mapper>

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{/layout/header::headFrag('fullPowerSalad')}"></head>
+
+<body>
+  <div th:replace="~{/layout/header::gnbFrag}"></div>
+  <div><a th:href="@{/item/itemRegister.html}">상품 등록</a></div>
+  <div><a th:href="@{/item/itemList.html}">상품 목록</a></div>
+  <div th:replace="~{/layout/footer::gnbFooter}"></div>
+</body>  
+
+<script th:inline="javascript">
+</script>
+
+</html> 

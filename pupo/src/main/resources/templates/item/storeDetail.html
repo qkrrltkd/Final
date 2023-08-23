@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{/layout/header::headFrag('fullPowerSalad')}"></head>
+
+<body class="goto-here" style="padding: 0px 300px 0px 300px;">
+  <div th:replace="~{/layout/header::gnbFrag}"></div>
+
+  <main id="product">
+
+    <section class="view">
+      <nav>
+        <h1>상품보기</h1>
+      </nav>
+
+      <article class="info">
+        <div class="image">
+          <img th:src="@{/item/itemImgDisplay.do(itemId=${item.itemId})}" alt="상품이미지">
+        </div>
+
+        <div class="summary">
+          <nav>
+            <h3><span th:text="${item.itemName}"></span></h3>
+            <p><span th:text="${item.description}"></span></p>
+          </nav>
+
+          <nav>
+            <div class="dis_price">
+              <div th:text="${#numbers.formatInteger(item.price, 3, 'COMMA') }"></div>
+            </div>
+          </nav>
+
+          <nav>
+            <div class="delivery">무료배송</div>
+            <div class="desc">본 상품은 국내배송만 가능합니다.</div>
+          </nav>
+
+          <nav>
+            <span class="origin">원산지-상세설명 참조</span>
+          </nav>
+
+          <div>
+            <div th:text="${item.itemName}"></div>
+            <input type="hidden" name="itemId" th:value="${item.itemId}" >
+            <input type="hidden" name="itemPrice" th:value="${item.price}" readOnly>
+            <input type="hidden" name="loginId" th:value="${session.loginId}"><br>
+            <input type="button" onclick="fnDown()" value="-">
+            <input type="text" name="cntInput" id="cntInput" value="1" readOnly style="border: none; background-color: transparent; outline: none; box-shadow: none; width: 15px;  text-align: center; ">
+            <input type="button" onclick="fnUp()" value="+">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <input type="text" name="totalPrice" id="totalPrice" th:value="${#numbers.formatInteger(item.price, 3, 'COMMA')}" style="border: none; background-color: transparent; outline: none; box-shadow: none; width: 200px;  text-align: center; margin-bottom: 10px;"><br><br>
+            <div class="button" style="margin-bottom: 10px;">
+              <a href="#" class="btn btn-success" th:onclick="addCart([[${session.loginId == null ? '' : session.loginId}]], [[${item.itemId}]]);">장바구니</a>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <article class="detail">
+      <nav style="border-bottom: 3px solid"><h1>상품정보</h1></nav><br>
+      <div style="text-align: center;">
+	      <img th:src="@{/item/itemImgDetailDisplay.do(itemId=${item.itemId})}" alt="상세페이지1">
+      </div>
+    </article>
+    
+
+    <article class="notice">
+      <nav>
+        <h1>상품 정보 제공 고시</h1>
+        <p>[전자상거래에 관한 상품정보 제공에 관한 고시] 항목에 의거 등록된 정보입니다.</p>
+      </nav>
+      <table>
+        <tr>
+          <td>상품번호</td>
+          <td>11111111111</td>
+        </tr>
+        <tr>
+          <td>상품상태</td>
+          <td>새상품</td>
+        </tr>
+        <tr>
+          <td>부가세 면세여부</td>
+          <td>과세상품</td>
+        </tr>
+        <tr>
+          <td>영수증발행</td>
+          <td>발행가능 - 신용카드 전표, 온라인 현금영수증</td>
+        </tr>
+        <tr>
+          <td>사업자구분</td>
+          <td>사업자 판매자</td>
+        </tr>
+        <tr>
+          <td>브랜드</td>
+          <td>블루포스</td>
+        </tr>
+        <tr>
+          <td>원산지</td>
+          <td>국내생산</td>
+        </tr>
+      </table>
+
+      <table>
+        <tr>
+          <td>제품소재</td>
+          <td>상세정보 직접입력</td>
+        </tr>
+        <tr>
+          <td>색상</td>
+          <td>상세정보 직접입력</td>
+        </tr>
+        <tr>
+          <td>치수</td>
+          <td>상세정보 직접입력</td>
+        </tr>
+        <tr>
+          <td>제소사/수입국</td>
+          <td>상세정보 직접입력</td>
+        </tr>
+        <tr>
+          <td>제조국</td>
+          <td>상세정보 직접입력</td>
+        </tr>
+        <tr>
+          <td>취급시 주의사항</td>
+          <td>상세정보 직접입력</td>
+        </tr>
+        <tr>
+          <td>제조연월</td>
+          <td>상세정보 직접입력</td>
+        </tr>
+        <tr>
+          <td>품질보증기준</td>
+          <td>상세정보 직접입력</td>
+        </tr>
+        <tr>
+          <td>A/S 책임자와 전화번호</td>
+          <td>상세정보 직접입력</td>
+        </tr>
+        <tr>
+          <td>주문후 예상 배송기간</td>
+          <td>상세정보 직접입력</td>
+        </tr>
+        <tr>
+          <td colspan="2">구매, 교환, 반품, 배송, 설치 등과 관련하여 추가비용, 제한조건 등의 특이사항이 있는 경우</td>
+        </tr>
+      </table>
+
+      <p class="notice">
+        소비자가 전자상거래등에서 소비자 보호에 관한 법률 제 17조 제1항 또는 제3항에 따라 청약철회를 하고
+        동법 제 18조 제1항 에 따라 청약철회한 물품을 판매자에게 반환하였음에도 불구 하고 결제 대금의
+        환급이 3영업일을 넘게 지연된 경우, 소비자 는 전자상거래등에서 소비자보호에 관한 법률 제18조
+        제2항 및 동법 시행령 제21조 2에 따라 지연일수에 대하여 전상법 시행령으로 정하는 이율을 곱하여
+        산정한 지연이자(“지연배상금”)를 신청할 수 있습니다. 아울러, 교환∙반품∙보증 및 결제대금의
+        환급신청은 [나의쇼핑정보]에서 하실 수 있으며, 자세한 문의는 개별 판매자에게 연락하여 주시기 바랍니다.
+      </p>
+
+      <!-- 배송안내 body 시작 -->
+      <div id="delieveryInfo">
+        <p id="moveContentTitle">배송 안내</p>
+        <div style="font-size: 15px;  line-height: 25px;">
+          기본 배송료 : 2500원 (도서산간 지역 배송비 추가) <br>
+          무료 배송 : 100,000원 이상 구매 시 (도서산간 지역 200,000원 이상 구매 시) <br>
+          상품배송 <br>
+              - 결제 완료 후 1~2일 이내 도착 <br>
+              - 영업일 오후 3시 이전 주문 시 : 당일 발송 <br>
+              - 영업일 오후 3시 이후 주문 시 : 명일 발송 <br>
+              - 토, 일 공휴일 주문 시  : 휴일 이후 영업일 첫날 발송 <br>
+          ※ 천재지변, 명절(설/추석)에는 택배사 배송 물량 폭주로 배송이 지연될 수 있으니 양해 부탁드립니다. <br>
+        </div>
+      </div>
+      <!-- 배송안내 body 끝 -->
+
+      <!-- 교환 및 반품 body 시작 -->       
+      <div id="refundInfo">
+        <br><br>
+        <p id="moveContentTitle">교환 및 반품</p>
+        <div style="font-size: 15px; line-height: 25px;">
+          교환 및 반품은 배송 완료 후 7일 이내까지 가능 <br>
+          - 제품 품질 이상, 오 배송의 경우 교환 및 반품 비용은 회사에서 부담합니다. <br>
+          - 고객님의 단순 변심의 경우 교환 및 반품 비용은 본인 부담입니다. <br>
+          ※ 상품을 확인하기 위해 택배 박스의 포장은 제거할 수 있으나, 내부 상품을 보호하는 비닐을 제거할 경우 반품할 수 없습니다. 내부 상품을 보호하는 비닐은 투명 비닐을 사용했기 때문에 비닐을 제거하지 않아도 충분히 상품을 확인할 수 있습니다. <br>
+        </div>
+      </div>      
+    </article>
+
+  </main>
+
+  <div th:replace="~{/layout/footer::gnbFooter}"></div>
+</body>
+
+<script th:inline="javascript">
+  
+    function fnDown() {
+    var currentValue = parseInt($('#cntInput').val());
+    if (currentValue > 1) {
+        $('#cntInput').val(currentValue - 1);
+        updateTotalPrice(currentValue - 1);
+    } else {
+        alert('최소 수량은 1개 입니다.');
+    }
+  }
+
+  function fnUp() {
+    var currentValue = parseInt($('#cntInput').val());
+    if (currentValue < '[[${item.stock}]]') {
+        $('#cntInput').val(currentValue + 1);
+        updateTotalPrice(currentValue + 1);
+    } else {
+        alert('재고 수량 초과입니다.');
+    }
+  }
+
+  function updateTotalPrice(count) {
+    // 가격을 계산하고 업데이트하는 로직을 구현합니다.
+    // 예시로 가격은 count에 따라 단순히 100을 곱한 값으로 계산되도록 하였습니다.
+    var regPrice = '[[${item.price}]]'
+    var price = count * regPrice;
+    var price2 = price.toLocaleString()
+    $('#totalPrice').val(price2);
+  }
+  
+  
+  // 장바구니 버튼
+  function addCart(loginId, itemId){
+    if(loginId == ''){
+      const result = alert("먼저 로그인 해야합니다.");
+      location.href='/user/login.html';
+      return;
+    }
+    addCartAjax(itemId);
+  }
+  
+  // 장바구니 등록
+  function addCartAjax(itemId){
+    const quantity = document.querySelector('#cntInput').value;
+    
+    $.ajax({
+      url : 'addCart.do',
+      type : 'post',
+      data : {'itemId' : itemId, 'quantity' : quantity},
+      success : function(result){
+        const result1 = confirm('장바구니에 상품을 추가했습니다. \n 장바구니 목록 페이지로 가시겠습니까?');
+        
+        if(result1){
+          location.href='/item/cartList.html';
+        }
+      },
+      error : function() {
+        alert('장바구니 등록에 실패했습니다.');
+      }
+    })
+  }
+
+</script>
+
+<style>
+  #product > .view > article { 
+      width: 100%; 
+      height: auto; 
+      overflow: hidden; 
+  }        
+  #product > .view > .info > div { 
+      float: left; 
+      width: 50%; 
+      height: 100%; 
+      padding: 10px; 
+      box-sizing: border-box; 
+  }
+  #product > .view > .info > .image > img { 
+      width: 100%; 
+  }
+  #product > .view > .info > .summary > nav { 
+      border-bottom: 1px solid #eaeaea; 
+      padding-bottom: 10px; 
+      margin-bottom: 12px; 
+      overflow: hidden; 
+  } 
+  #product > .view > .info > .summary > nav > h3 { 
+      font-size: 18px; 
+      font-weight: bold; 
+      color: #1e2732; 
+  }
+  #product > .view > .info > .summary > nav > p { 
+      font-size: 14px; 
+      color: #474747; 
+      line-height: 36px; 
+      letter-spacing: -1px; 
+  }
+  #product > .view > .info > .summary > nav > span { 
+      display: inline-block; 
+      font-size: 18px; 
+      margin-top: 15px; 
+  }
+  #product > .view > .info > .summary > nav > span > a { 
+      color: #0f0f0f; 
+      font-size: 24px; 
+      font-weight: bold; 
+  }
+  #product > .view > .info > .summary > nav > span > a::after { 
+      content: "원"; 
+      font-weight: normal; 
+  }
+  #product > .view > .info > .summary > nav:nth-child(2) > .delivery { 
+      font-size: 16px; 
+      color: #2e8de5; 
+  }
+  #product > .view > .info > .summary > nav:nth-child(2) > .desc { 
+      display: block; 
+      color: #aaa; 
+  }
+  #product > .view > .info > .summary > nav:nth-child(3) > .origin { 
+      font-size: 16px; 
+  }
+</style>
+
+</html> 

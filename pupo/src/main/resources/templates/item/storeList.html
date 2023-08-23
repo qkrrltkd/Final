@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+  <!-- Header section -->
+  <head th:replace="~{/layout/header::headFrag('FullPowerSalad')}"></head>
+  
+  <!-- Navigation section -->
+  <div th:replace="~{/layout/header::gnbFrag}"></div>
+
+  <body>
+    <section class="ftco-section">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-md-10 mb-5 text-center">
+            <ul class="product-category">
+              <form th:action="@{/item/storeList.html}" class="p-5 search-form" id="frm1">
+                <div class="form-group">
+                  <input name="query" id="query" type="text" class="form-control" placeholder="검색어를 입력하세요" aria-describedby="button-addon2">
+                  <span class="icon ion-ios-search" style="cursor: pointer;"></span>
+                </div>
+              </form>
+              <div th:each="categoryList : ${categoryList}"></div>
+              <li><a th:href="@{/item/storeList.html}">전체</a></li>
+              <li><a th:href="|@{/item/storeList.html(categoryId=1)}|">샐러드</a></li>
+              <li><a th:href="|@{/item/storeList.html(categoryId=2)}|">샌드위치</a></li>
+              <li><a th:href="|@{/item/storeList.html(categoryId=3)}|">과일</a></li>
+              <li><a th:href="|@{/item/storeList.html(categoryId=4)}|">육류</a></li>
+            </ul>
+          </div>
+        </div>
+       
+        <div class="row">
+          <div class="col-md-6 col-lg-3 ftco-animate fadeInUp ftco-animated" th:each="itemList : ${itemList}">
+            <div class="product">
+              <a th:href="@{/item/storeDetail.html(itemId=${itemList.itemId})}" class="img-prod"><img id="imgSize" class="img-fluid" th:src="@{/item/itemImgDisplay.do(itemId=${itemList.itemId})}" alt="Colorlib Template"></a>
+              <div class="overlay"></div>
+              <div class="text py-3 pb-4 px-3 text-center">
+                <h3><a th:href="@{/item/storeDetail.html(itemId=${itemList.itemId})}" th:text="${itemList.itemName}"></a></h3>
+                <div class="d-flex">
+                  <div class="text py-3 pb-4 px-3 text-center">
+                    <p class="price"><span class="mr-2 price" th:text="${itemList.price}"></span><span class="price-sale"></span></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Footer section -->
+    <div th:replace="~{/layout/footer::gnbFooter}"></div>
+  </body>
+
+</html>

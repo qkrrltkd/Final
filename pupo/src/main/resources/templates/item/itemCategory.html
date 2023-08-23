@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="headFrag(title)">
+  <meta charset="UTF-8">
+  <title th:text="${title}">PullPowerSalad 판매자:메인페이지</title>
+  
+  <!-- font-awesome icon -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css">
+  
+  <!-- 부트스트랩테마 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- General CSS Files -->
+  <link rel="stylesheet" th:href="@{/assets/modules/bootstrap/css/bootstrap.min.css}">
+  <link rel="stylesheet" th:href="@{/assets/modules/fontawesome/css/all.min.css}">
+
+  <!-- CSS Libraries -->
+  <link rel="stylesheet" th:href="@{/assets/modules/jqvmap/dist/jqvmap.min.css}">
+  <link rel="stylesheet" th:href="@{/assets/modules/summernote/summernote-bs4.css}">
+  <link rel="stylesheet" th:href="@{/assets/modules/owlcarousel2/dist/assets/owl.carousel.min.css}">
+  <link rel="stylesheet" th:href="@{/assets/modules/owlcarousel2/dist/assets/owl.theme.default.min.css}">
+
+  <!-- Template CSS -->
+  <link rel="stylesheet" th:href="@{/assets/css/style.css}">
+  <link rel="stylesheet" th:href="@{/assets/css/components.css}">
+  
+  <!-- Start GA -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-94034622-3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-94034622-3');
+  </script>
+</head>
+
+<body>
+  <!-- top -->
+  <div th:fragment="topFrag" class="top">
+    <div id="app">
+      <div class="main-wrapper main-wrapper-1">
+        <div class="navbar-bg"></div>
+        <nav class="navbar navbar-expand-lg main-navbar">
+          <form class="form-inline mr-auto">
+            <ul class="navbar-nav mr-3">
+              <li><a href="#" data-toggle="sidebar" class="nav-link nav-link-lg"><i class="fas fa-bars"></i></a></li>
+            </ul>
+          </form>
+          <ul class="navbar-nav navbar-right">
+            <li class="dropdown dropdown-list-toggle"><a href="#" data-toggle="dropdown" class="nav-link notification-toggle nav-link-lg beep"><i class="far fa-bell"></i></a>
+              <div class="dropdown-menu dropdown-list dropdown-menu-right">
+                <div class="dropdown-list-content dropdown-list-icons">
+                  <a href="#" class="dropdown-item dropdown-item-unread"></a>
+                  <a href="#" class="dropdown-item">
+                    <div class="dropdown-item-icon bg-info text-white">
+                      <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="dropdown-item-desc">
+                      주문 : <b>신규 주문</b>이 있습니다.</b>
+                      <div class="time">1시간 전</div>
+                    </div>
+                  </a>
+                </div>
+                <div class="dropdown-footer text-center">
+                  <a href="#">View All <i class="fas fa-chevron-right"></i></a>
+                </div>
+              </div>
+            </li>
+            <li class="dropdown"><a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
+              <div class="d-sm-none d-lg-inline-block">안녕하세요, 판매자님</div></a>
+              <div class="dropdown-menu dropdown-menu-right">
+                <div class="dropdown-title">Logged in 5 min ago</div>
+                <div class="dropdown-divider"></div>
+                <a th:href="@{/user/logout.do}" class="dropdown-item has-icon text-danger">
+                  <i class="fas fa-sign-out-alt"></i> 로그아웃
+                </a>
+              </div>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      
+      <!-- sidebar -->    
+      <div th:fragment="sideFrag" class="side" >
+        <div class="main-sidebar sidebar-style-2">
+          <aside id="sidebar-wrapper">
+            <div class="sidebar-brand">
+              <a href="#">판매자</a>
+            </div>
+            <div class="sidebar-brand sidebar-brand-sm">
+              <a href="index.html">판매자</a>
+            </div>
+            <ul class="sidebar-menu">
+              <li class="menu-header">주문</li>
+              <li class="dropdown">
+                <a href="#" class="nav-link has-dropdown"><i class="fas fa-receipt"></i> <span>주문 관리</span></a>
+                <ul class="dropdown-menu">
+                  <li><a class="nav-link" href="errors-503.html">주문 조회</a></li> 
+                  <li><a class="nav-link" href="errors-403.html">배송 조회</a></li> 
+                </ul>
+              </li>
+              <li class="menu-header">상품</li>
+              <li class="dropdown">
+                <a href="#" class="nav-link has-dropdown"><i class="fa-solid fa-cart-shopping"></i><span>상품 관리</span></a>
+                <ul class="dropdown-menu">
+                  <li><a class="nav-link" th:href="@{/item/cateManage.html}">카테고리 관리</a></li> 
+                  <li><a class="nav-link" th:href="@{/item/itemRegister.html}">상품 등록</a></li> 
+                  <li><a class="nav-link" th:href="@{/item/itemList.html}">상품 조회</a></li> 
+                  <li><a class="nav-link" th:href="@{/item/itemList.html}">상품 수정</a></li> 
+                </ul>
+              </li>
+            </ul>
+          </aside>
+        </div>
+      </div>
+      
+      <!-- Main Content -->
+      <div class="mainContent" style="margin-top:50px; margin-left:200px;">
+        <div>
+          <h3>.</h3>
+        </div>
+        <div class="row" style="margin-top:50px; margin-left:300px;">
+          <div class="col">
+            <div class="row">
+              <div class="col">카테고리 등록</div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <form class="row">
+                  <div class="col-8">
+                    <input type="text" class="form-control" id="cateName" placeholder="카테고리명 입력" >
+                  </div>
+                  <div class="col-4">
+                    <button type="submit" class="btn btn-primary mb-3" onclick="addCategory();">등록</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div>
+              <h3>카테고리 목록</h3>
+            </div>
+            <table class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <td>No</td>
+                  <td>카테고리명</td>
+                  <td>사용 여부</td>
+                  <td>순번</td>
+                  <td>삭제</td>
+                </tr>
+              </thead>
+              <tbody>
+                <th:block th:if="${#lists.size(cateList) == 0}">
+                  <tr>
+                    <td colspan="4">등록된 카테고리가 없습니다.</td>
+                  </tr>
+                </th:block>
+                <th:block th:unless="${#lists.size(cateList) == 0}">
+                  <tr th:each="cateList, state : ${cateList}">
+                    <td>[[${state.count}]]</td>
+                    <td>[[${cateList.cateName}]]</td>
+                    <td>[[${cateList.isUse}]]</td>
+                    <td>[[${cateList.orderNum}]]</td>
+                    <td><input type="button" value="삭제" class="btn btn-danger" th:onclick="|location.href='@{/item/deleteCategory(cateCode=${cateList.cateCode})}';|"></td>
+                  </tr>
+                </th:block>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- footer -->
+      <footer th:fragment="footerFrag" class="main-footer" >
+        <div class="footer-left">
+          Copyright &copy; 2023
+          <div class="bullet"></div>
+          Design By <a href="https://nauval.in/">Muhamad Nauval Azhar</a>
+        </div>
+        <div class="footer-right"> 
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- General JS Scripts -->
+  <script th:src="@{/assets/modules/jquery.min.js}"></script>
+  <script th:src="@{/assets/modules/popper.js}"></script>
+  <script th:src="@{/assets/modules/tooltip.js}"></script>
+  <script th:src="@{/assets/modules/bootstrap/js/bootstrap.min.js}"></script>
+  <script th:src="@{/assets/modules/nicescroll/jquery.nicescroll.min.js}"></script>
+  <script th:src="@{/assets/modules/moment.min.js}"></script>
+  <script th:src="@{/assets/js/stisla.js}"></script>
+  
+  <!-- JS Libraries -->
+  <script th:src="@{/assets/modules/jquery.sparkline.min.js}"></script>
+  <script th:src="@{/assets/modules/chart.min.js}"></script>
+  <script th:src="@{/assets/modules/owlcarousel2/dist/owl.carousel.min.js}"></script>
+  <script th:src="@{/assets/modules/summernote/summernote-bs4.js}"></script>
+  <script th:src="@{/assets/modules/chocolat/dist/js/jquery.chocolat.min.js}"></script>
+
+  <!-- Page Specific JS File -->
+  <script th:src="@{/assets/js/page/index.js}"></script>
+  
+  <!-- Template JS File -->
+  <script th:src="@{/assets/js/scripts.js}"></script>
+  <script th:src="@{/assets/js/custom.js}"></script>
+
+  <script th:inline="javascript">
+    function addCategory(){
+      // 카테고리명이 빈값인지 확인
+      const cateNameTag = document.querySelector('#cateName');
+      if(cateNameTag.value == ''){
+        alert('카테고리명을 입력하세요.');
+        return;
+      }
+    
+      // 카테고리 중복 확인
+      if(checkCateName(cateNameTag.value)){
+        alert('카테고리명이 중복입니다.');
+        cateName.value= '';
+        return;
+      }
+
+      $.ajax({
+        url: '/item/goodCategory.do',  // 요청경로
+        type: 'post',
+        data: {'cateName' : cateNameTag.value}, // 필요한 데이터
+        success: function(result){
+          alert('성공');
+        },
+        error: function(){
+          alert('실패');
+        }
+      });
+    }
+
+    //카테고리 등록 시 중복 확인
+    function checkCateName(cateName){
+      let isDuplicate = false;
+      
+      $.ajax({
+        url: '/item/checkCateName',
+        type: 'post',
+        async: false, // 동기방식으로 진행, 작성안하면 기본 true
+        data: {'cateName' : cateName},
+        success: function(result){
+          if(result == 1){
+            isDuplicate = true;
+          }
+        },
+        error: function(){
+          alert('실패');
+        }
+      });
+      
+      return isDuplicate;
+    }
+  </script>
+
+  <style>
+    td {
+      border-bottom: 1px solid #ddd;
+      padding: 8px;
+      height: 30px;
+    }
+
+    li {
+      list-style: none;
+    }
+
+    a {
+      text-decoration: none;
+      color: #303030;
+      font-size: 17px;
+    }
+
+    .regi_form {
+      margin-top:50px;
+      margin-left: 100px;
+    }
+
+    #uploadBtn,
+    #enrollBtn,
+    #resetBtn,
+    #backBtn,
+    #addCategoryBtn {
+      background-color: #8FA691 ; 
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      font-weight: bold;
+      margin: 20px 2px;
+    }
+
+    #enrollBtn:focus,
+    #uploadBtn:focus,
+    #resetBtn:focus{
+      outline:none;
+      border: none;
+    }
+
+    .regi_btn {
+      float: center;
+      margin-right:330px;
+    }
+
+    .mainContent .title {
+      margin-left: 100px;
+    }
+
+    .mainContent h3{
+      font-weight:500;
+      font-size:24px;
+      margin-bottom:10px;
+    }
+
+    .mainContent p{
+      color: #b9b9b9;
+      margin-top:0;
+    }
+  </style>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{/layout/header::headFrag('Welcome')}"></head>
+<div th:replace="~{/layout/header::gnbFrag}"></div>
+<body class="goto-here">
+  <div class="overlay"></div>
+    <div class="container">
+    <!-- 여기서부터적기 -->
+    
+    <div class="nav navbar">
+          <div class="row section-header-breadcrumb ftco-animate">
+            <div class="breadcrumb-item active"><a href="/">home</a></div>
+            <div class="breadcrumb-item">비밀번호 찾기</div>
+          </div>
+        </div>
+    <div class="container d-flex justify-content-center">
+      <div class="wrapper fadeInDown">
+        <div id="formContent">
+          <div class="login-content">
+          <!-- form 태그 시작 -->
+            <form id="frmFindPw" method="post" th:action="@{/user/findPw.do}">
+              <input type="hidden" name="url" th:value="http://localhost:8080/">
+                <div class="ftco-animate">
+                  <div class="heading-section text-center">
+                    <span class="subheading ftco-animate ">FullPowerSalad</span>
+                    <h2 class="title ftco-animate">비밀번호 찾기</h2>
+                  </div>
+                </div>
+                <div class="mt-3 input-div one ftco-animate">
+                  <div class="i">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  <div class="div ftco-animate">
+                    <label for="name">*이름</label>
+                    <input type="text" name="name" id="name" required="required">
+                  </div>
+                </div>
+                <div class="input-div pass ftco-animate">
+                  <div class="i"> 
+                    <i class="fas fa-lock"></i>
+                  </div>
+                  <div class="div ftco-animate">
+                    <label for="email">*이메일</label>
+                    <input type="text" name="email" id="email" required="required">
+                  </div>
+                </div>
+                <div class="ftco-animate">
+                  <input class="loginButton fadeIn fourth" type="button" th:value="아이디찾기" id="btnFindId" >
+                </div>
+                <div class="ftco-animate">
+                  <span class="d-flex justify-content-around mb-3">
+                    <a class="a-link" th:href="@{/user/login.form}">로그인</a>
+                    <span>|</span>
+                    <a class="a-link" th:href="@{/user/findPw.form}">비밀번호 찾기</a>
+                    <span>|</span>
+                    <a class="a-link" th:href="@{/user/agree.form}">회원가입</a>
+                  </span>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+    
+    
+    
+    
+  <h1>비밀번호 찾기</h1>
+  
+  <hr>
+  
+  <div>
+    <form id="frmFindPw" method="post" th:action="@{/user/findPw.do}">
+    
+      <div>
+        <label for="id">
+          *아이디<br>
+          <input type="text" name="id" id="id">
+        </label>
+      </div>
+      
+      <div>
+        <label for="email">
+          *이메일<br>
+          <input type="text" name="email" id="email">
+        </label>
+      </div>
+      
+      <button>임시 비밀번호 발급</button>
+
+      <br><br>
+      
+      <div>
+        <a th:href="@{/user/login/form}">로그인</a> / 
+        <a th:href="@{/user/findId/form}">아이디 찾기</a> /
+        <a th:href="@{/user/agree/form}">회원가입</a>
+      </div>
+      
+    </form>
+  </div>
+   <!-- 여기까지적기 -->
+    </div>
+<div th:replace="~{/layout/footer::gnbFooter}"></div> 
+<script th:inline="javascript">
+
+
+  $(document).ready(function(){
+    fn_findPw2();
+  });
+
+  function fn_findPw2(){
+
+      $('#frmFindPw').on('submit', function(event){
+        
+      });
+  }
+
+</script>
+  </body>
+</html>
